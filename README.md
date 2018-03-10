@@ -5,7 +5,7 @@ A lil finite state machine
 This is mostly intended to be used within Unity, but I guess could be used in any C# environment. Inspired by Prime31's [StateKitLite](https://github.com/prime31/StateKit) and RSG's [Fluent State Machine](https://github.com/Real-Serious-Games/Fluent-State-Machine)
 
 
-##Example
+## Example
 ```
 	private enum EnemyState {
 		Idle,
