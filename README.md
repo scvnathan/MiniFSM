@@ -44,6 +44,17 @@ This is mostly intended to be used within Unity, but I guess could be used in an
 
 	private void Update() {
 		machine.Update();
+		if (Input.GetKeyDown(KeyCode.A)) {
+			machine.ChangeState(EnemyState.Idle);
+		}
+		
+		if (Input.GetKeyDown(KeyCode.B)) {
+			machine.ChangeState(EnemyState.Patrolling);
+		}
+		
+		if (Input.GetKeyDown(KeyCode.C)) {
+			machine.ChangeState(EnemyState.Attacking);
+		}		
 	}
 		
 ```
