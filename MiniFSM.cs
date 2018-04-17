@@ -1,34 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using UnityEngine;
 
 public class MiniFSMHandler<TEnum> where TEnum : struct, IConvertible, IComparable, IFormattable {
-	public TEnum State;
-	public Action Enter;
-	public Action Update;
-	public Action Exit;
+	public virtual TEnum State { get; set; }
+	public virtual Action Enter { get; set; }
+	public virtual Action Update { get; set; }
+	public virtual Action Exit { get; set; }
 }
 
 public class MiniFSM<TEnum> where TEnum : struct, IConvertible, IComparable, IFormattable {
 	private TEnum _currentState;
 	private TEnum _previousState;
 	private MiniFSMHandler<TEnum> _currentHandler;
-	private readonly Dictionary<TEnum, MiniFSMHandler<TEnum>> states = new Dictionary<TEnum, MiniFSMHandler<TEnum>>();
+	private readonly Dictionary<TEnum, MiniFSMHandler<TEnum>> machineStates = new Dictionary<TEnum, MiniFSMHandler<TEnum>>();
 
 	public event Action<TEnum, TEnum> OnStateChanged;
 
 	public MiniFSM(params MiniFSMHandler<TEnum>[] states) {
 		foreach (MiniFSMHandler<TEnum> state in states) {
-			states.Add(state.State, state);
+			Add(state);
 		}
 	}
 
 	public void StartMachine(TEnum initialState) {
-		if (!states.ContainsKey(initialState)) return;
+		if (!machineStates.ContainsKey(initialState)) return;
 
 		_currentState = initialState;
-		_currentHandler = states[initialState];
-		states[initialState].Enter();
+		_currentHandler = machineStates[initialState];
+		machineStates[initialState].Enter();
+	}
+
+	public void Add(MiniFSMHandler<TEnum> state) {
+		if (machineStates.ContainsKey(state.State)) {
+			Debug.LogError($"Already contains {state.State}");
+			return;
+		}
+		
+		machineStates.Add(state.State, state);
 	}
 
 	public void Update() {
@@ -42,10 +51,10 @@ public class MiniFSM<TEnum> where TEnum : struct, IConvertible, IComparable, IFo
 		_previousState = _currentState;
 		_currentState = nextState;
 
-		_currentHandler = states[_currentState];
+		_currentHandler = machineStates[_currentState];
 
 		// exit the prev state, enter the next state
-		states[_previousState].Exit();
+		machineStates[_previousState].Exit();
 		_currentHandler.Enter();
 
 		// fire the changed event if we have a listener
