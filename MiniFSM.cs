@@ -13,22 +13,22 @@ public class MiniFSM<TEnum> where TEnum : struct, IConvertible, IComparable, IFo
 	private TEnum _currentState;
 	private TEnum _previousState;
 	private MiniFSMHandler<TEnum> _currentHandler;
-	private readonly Dictionary<TEnum, MiniFSMHandler<TEnum>> statesHandlers = new Dictionary<TEnum, MiniFSMHandler<TEnum>>();
+	private readonly Dictionary<TEnum, MiniFSMHandler<TEnum>> states = new Dictionary<TEnum, MiniFSMHandler<TEnum>>();
 
 	public event Action<TEnum, TEnum> OnStateChanged;
 
-	public MiniFSM(params MiniFSMHandler<TEnum>[] handlers) {
-		foreach (MiniFSMHandler<TEnum> miniFsmHandler in handlers) {
-			statesHandlers.Add(miniFsmHandler.State, miniFsmHandler);
+	public MiniFSM(params MiniFSMHandler<TEnum>[] states) {
+		foreach (MiniFSMHandler<TEnum> state in states) {
+			states.Add(state.State, state);
 		}
 	}
 
 	public void StartMachine(TEnum initialState) {
-		if (!statesHandlers.ContainsKey(initialState)) return;
+		if (!states.ContainsKey(initialState)) return;
 
 		_currentState = initialState;
-		_currentHandler = statesHandlers[initialState];
-		statesHandlers[initialState].Enter();
+		_currentHandler = states[initialState];
+		states[initialState].Enter();
 	}
 
 	public void Update() {
@@ -42,10 +42,10 @@ public class MiniFSM<TEnum> where TEnum : struct, IConvertible, IComparable, IFo
 		_previousState = _currentState;
 		_currentState = nextState;
 
-		_currentHandler = statesHandlers[_currentState];
+		_currentHandler = states[_currentState];
 
 		// exit the prev state, enter the next state
-		statesHandlers[_previousState].Exit();
+		states[_previousState].Exit();
 		_currentHandler.Enter();
 
 		// fire the changed event if we have a listener
