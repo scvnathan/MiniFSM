@@ -16,6 +16,7 @@ public class MiniFSM<TEnum> where TEnum : struct, IConvertible, IComparable, IFo
 	private readonly Dictionary<TEnum, MiniFSMHandler<TEnum>> machineStates = new Dictionary<TEnum, MiniFSMHandler<TEnum>>();
 
 	public event Action<TEnum, TEnum> OnStateChanged;
+	public TEnum CurrentState => _currentState;
 
 	public MiniFSM(params MiniFSMHandler<TEnum>[] states) {
 		foreach (MiniFSMHandler<TEnum> state in states) {
